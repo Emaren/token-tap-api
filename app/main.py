@@ -4,9 +4,9 @@ from app import models
 from app.database import SessionLocal, engine
 from app.schemas import UserCreate, TokenCreate, TokenAction, TokenTransactionOut
 
-models.Base.metadata.create_all(bind=engine)
-
 app = FastAPI()
+
+models.Base.metadata.create_all(bind=engine)
 
 def get_db():
     db = SessionLocal()
