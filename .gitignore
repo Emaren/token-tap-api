@@ -1,4 +1,6 @@
+.env
 .envrc
 .direnv/
 .python-version
+venv/
 venv-logs/
