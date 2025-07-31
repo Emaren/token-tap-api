@@ -4,5 +4,5 @@
 .python-version
 venv/
 venv-logs/
-
+*.pyc
 bin/
