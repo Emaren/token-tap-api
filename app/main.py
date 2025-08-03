@@ -83,3 +83,6 @@ def view_token_history(token_id: int, db: Session = Depends(get_db)):
     ).all()
     return txs
 
+@app.get("/ping")
+def ping():
+    return {"status": "ok"}
