@@ -6,3 +6,14 @@ venv/
 venv-logs/
 *.pyc
 bin/
+venv-pip-install.log
+
+# Secrets
+.env
+.env.*
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+venv-logs/

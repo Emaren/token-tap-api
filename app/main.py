@@ -8,6 +8,7 @@ app = FastAPI()
 
 models.Base.metadata.create_all(bind=engine)
 
+
 def get_db():
     db = SessionLocal()
     try:
@@ -15,9 +16,16 @@ def get_db():
     finally:
         db.close()
 
+
 @app.get("/")
 def root():
     return {"status": "TokenTap API running"}
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "service": "tokentap-api", "version": "0.1.0"}
+
 
 @app.post("/users/")
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
@@ -31,6 +39,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db.refresh(db_user)
     return db_user
 
+
 @app.post("/tokens/")
 def create_token(token: TokenCreate, db: Session = Depends(get_db)):
     db_token = models.Token(**token.dict())
@@ -38,6 +47,7 @@ def create_token(token: TokenCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_token)
     return db_token
+
 
 @app.post("/tokens/{token_id}/issue")
 def issue_token(token_id: int, payload: TokenAction, db: Session = Depends(get_db)):
@@ -50,11 +60,12 @@ def issue_token(token_id: int, payload: TokenAction, db: Session = Depends(get_d
         token_id=token_id,
         user_id=payload.user_id,
         action="issue",
-        amount=payload.amount
+        amount=payload.amount,
     )
     db.add(tx)
     db.commit()
     return {"status": "issued", "new_supply": token.supply}
+
 
 @app.post("/tokens/{token_id}/redeem")
 def redeem_token(token_id: int, payload: TokenAction, db: Session = Depends(get_db)):
@@ -70,18 +81,22 @@ def redeem_token(token_id: int, payload: TokenAction, db: Session = Depends(get_
         token_id=token_id,
         user_id=payload.user_id,
         action="redeem",
-        amount=payload.amount
+        amount=payload.amount,
     )
     db.add(tx)
     db.commit()
     return {"status": "redeemed", "new_supply": token.supply}
 
+
 @app.get("/tokens/{token_id}/history", response_model=list[TokenTransactionOut])
 def view_token_history(token_id: int, db: Session = Depends(get_db)):
-    txs = db.query(models.TokenTransaction).filter(
-        models.TokenTransaction.token_id == token_id
-    ).all()
+    txs = (
+        db.query(models.TokenTransaction)
+        .filter(models.TokenTransaction.token_id == token_id)
+        .all()
+    )
     return txs
+
 
 @app.get("/ping")
 def ping():
